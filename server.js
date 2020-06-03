@@ -693,19 +693,27 @@ app.post('/developersignup',function(req,res){
 const stripe = require('stripe')("sk_test_WUzPlklrvJTNUWxyNydpC4kX008qPBkKR4");
 app.post('/doPayment/', (req, res) => {
 
+
+	
 	console.log("in do payment api");
+
+	console.log("CUSETOMER EMIAL :  :  :  "  + req.body.email);
+
 	console.log(req.body.amount)
-  return stripe.customers.create({
-    email: 'YOUR_EMAILtest@test.com',
-    source: req.body.tokenId
+  	return stripe.customers.create({
+    email: req.body.email,
+	source: req.body.tokenId,
+	id:req.body.customerId
+	
   })
   .then(customer => {
     stripe.charges.create({
-      amount: req.body.amount*162, // Unit: cents
+      amount: req.body.amount *100, // Unit: cents
       currency: 'pkr',
       customer: customer.id,
       source: customer.default_source.id,
-      description: 'Test payment',
+	  description: 'Test payment',
+	
     })
   })
   .then(result => res.status(200).json(result))
