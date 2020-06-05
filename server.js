@@ -374,7 +374,7 @@ async function updateProductReview(productid){
    firebase.database().ref('comments/'+productid).on('value',(snapshot)=>{
 	  
 	   var comments=snapshot.val();
-	   var positiveSentiment =0;
+	   var totalsentiment =0;
 		var percentage = 0.0;
 		console.log(comments);
 		var length =1;
@@ -383,15 +383,10 @@ async function updateProductReview(productid){
 			for ( comment in comments){
 				var sentimentval=sentiment(comments[comment].commentText)
 				length+=1
-				if(sentimentval > 0){
-					console.log("++");
-					positiveSentiment++;
-				}
+				totalsentiment+=sentimentval;
 			}
-			percentage  = positiveSentiment*100.0/length;
-			console.log("Perecnetagee: " + percentage);
 		}
-		//console.log("Percentage:" + percentage);
+		firebase.database().ref("Product/"+productid).update({'sentiment':totalsentiment});
    })
 }
 
@@ -403,7 +398,7 @@ app.post('/addcomment', function(req, res) {
 	console.log(req.body.productid);
 
 //get sentiment value of comment
-// var sentimentval=sentiment(req.body.comment);
+var sentimentval=sentiment(req.body.comment);
 	
 	firebase
 		.database()
@@ -411,7 +406,7 @@ app.post('/addcomment', function(req, res) {
 		.push({
 			userid: req.body.userid,
 			commentText: req.body.comment,
-			//sentimentvalue: sentimentval
+			sentimentvalue: sentimentval
 		})
 		.then((data) => {
 			//success callback
